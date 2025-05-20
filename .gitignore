@@ -113,10 +113,6 @@ coverage
 *.avi
 *.mov
 *.mkv
-*.jpg
-*.jpeg
-*.png
 *.gif
 *.webp
-*.svg
 *.ico
