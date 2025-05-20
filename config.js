@@ -1,4 +1,4 @@
-const BASE_IP = import.meta.env.VITE_BASE_IP 
-const BASE_URL = import.meta.env.VITE_API_URL 
+const BASE_IP = 'localhost';
+const BASE_URL ="https://harmonicarchive-backend-production.up.railway.app";
 
 export { BASE_IP, BASE_URL };
