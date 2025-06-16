@@ -82,20 +82,26 @@
       </div>
     </div>
 
-    <!-- Chart Container -->
-    <div class="chart-container">
-      <MusicSheetsChart :musicSheets="musicSheets" />
+    <div class="filter-section">
+      <div class="filter-header">
+        <button class="view-charts-button" @click="goHome">My Archive</button>
+      </div>
     </div>
+
+    <div class="filter-section">
+      <div class="filter-header">
+        <button class="view-charts-button" @click="goToStatistics">View Statistics</button>
+      </div>
+    </div>    
     </div>
   </div>
 </template>
 
 <script>
-import MusicSheetsChart from "./MusicSheetsChart.vue";
+
 import { getCurrentUser, getCurrentUserTags, logout } from "../services/api";
 
 export default {
-  components: { MusicSheetsChart },
   props: {
     genres: {
       type: Array,
@@ -160,6 +166,12 @@ export default {
       } catch (error) {
         console.error("Logout error:", error);
       }
+    },
+    goToStatistics() {
+      this.$router.push("/charts"); // Redirect to the charts page
+    },
+    goHome() {
+      this.$router.push("/app"); // Redirect to the home page
     },
   },
 };

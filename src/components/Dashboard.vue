@@ -104,7 +104,7 @@ export default {
       isLoading: false, // Track loading state for infinite scroll
       allItemsLoaded: false, // Track if all items are loaded
       chunkSize: 64, // Number of items to fetch per scroll
-      isSidebarOpen: true, // Track sidebar state
+      isSidebarOpen: false, // Track sidebar state
     };
   },
   methods: {
