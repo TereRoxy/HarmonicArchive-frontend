@@ -28,7 +28,7 @@
         :sortBy="sortBy"
         :sortOrder="sortOrder"
         :currentPage="currentPage"
-        :totalPages="totalPages"
+        :totalPages="totalPages()"
         :itemsPerPage="itemsPerPage"
         @setSort="setSort"
         @goToPage="goToPage"
@@ -89,21 +89,13 @@ export default {
       genres: [],
       instruments: [],
       musicSheets: [], // Replace state.musicSheets with local data
-      totalItems: 60, // Total number of items for pagination
+      totalItems: 0, // Total number of items for pagination
       connectionStatus: 'disconnected', // Connection status for WebSocket
       reconnectAttempts: 0,
       maxReconnectAttempts: 5, // Maximum number of reconnection attempts
       lastWebSocketError: null, // Store the last WebSocket message
       isManualDisconnect: false, // Flag to indicate manual disconnection
     };
-  },
-  computed: {
-    totalPages() {
-      if (this.itemsPerPage === 'all') {
-        return 1; // If all items are displayed, only one page
-      }
-      return Math.ceil(this.totalItems / this.itemsPerPage);
-    },
   },
   methods: {
     fetchMusicSheets() {
@@ -113,21 +105,28 @@ export default {
       genres: this.selectedGenres.join(","),
       instruments: this.selectedInstruments.join(","),
       _page: this.currentPage,
-      _limit: this.itemsPerPage,
+      _limit: this.itemsPerPage === 'all' ? 1000 : this.itemsPerPage, // Use large limit for 'all'
       _sort: this.sortBy,
       _order: this.sortOrder,
     };
-    console.log("Fetching with params:", params); // Debug log
+    //console.log("Fetching with params:", params); // Debug log
 
     api.getMusicSheets(params)
       .then(response => {
         this.musicSheets = response.data.data || response.data; // Handle both response formats
-        this.totalItems = response.data.total || response.data.length || 0;
+        this.totalItems = response.data.totalCount;
       })
       .catch(error => {
         console.error("Error fetching music sheets:", error);
       });
   },
+
+  totalPages() {
+      if (this.itemsPerPage === 'all') {
+        return 1; // If all items are displayed, only one page
+      }
+      return Math.ceil(this.totalItems / (this.itemsPerPage || 1));
+    },
 
   async fetchTags() {
     try {
@@ -191,21 +190,13 @@ export default {
     },
     goToPage(page) {
       const pageNum = Number(page);
-      if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= this.totalPages) {
+      if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= this.totalPages()) {
         this.currentPage = pageNum;
-        this.fetchMusicSheets({
-          _page: this.currentPage,
-          _limit: this.itemsPerPage,
-          _sort: this.sortBy,
-          _order: this.sortOrder,
-          genres: this.selectedGenres.join(","),
-          instruments: this.selectedInstruments.join(","),
-          q: this.searchQuery
-        });
+        this.fetchMusicSheets(); // Use fetchMusicSheets directly with current component state
       }
     },
     changeItemsPerPage(itemsPerPage) {
-      this.itemsPerPage = itemsPerPage === 'all' ? Number.MAX_SAFE_INTEGER : parseInt(itemsPerPage);
+      this.itemsPerPage = itemsPerPage === 'all' ? 1000: parseInt(itemsPerPage);
       this.currentPage = 1;
       this.fetchMusicSheets();
     },

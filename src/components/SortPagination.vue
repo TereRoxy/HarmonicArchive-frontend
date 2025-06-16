@@ -123,6 +123,7 @@ export default {
       for (let i = start; i <= end; i++) {
         pages.push(i);
       }
+      console.log("Pages to show:", pages);
       return pages;
     },
   },

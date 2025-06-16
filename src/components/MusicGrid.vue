@@ -9,23 +9,12 @@
       <div class="item-info">
         <h3>{{ musicSheet.title }}</h3>
         <p><strong>Composer:</strong> {{ musicSheet.composer }}</p>
-        <p> <strong>Genres: </strong>
-          <span
-                v-for="(genre, index) in musicSheet.genres"
-                :key="index"
-              >
-                {{ genre }}
-              </span>
+        <p>
+          <strong>Genres:</strong> {{ musicSheet.genres.join(', ') }}
         </p>
 
         <p>
-          <strong>Instruments: </strong>
-          <span
-            v-for="(instrument, index) in musicSheet.instruments"
-            :key="index"
-          >
-            {{ instrument }}<span v-if="index < musicSheet.instruments.length - 1">, </span>
-          </span>
+          <strong>Instruments:</strong> {{ musicSheet.instruments.join(', ') }}
         </p>
 
         <p>
