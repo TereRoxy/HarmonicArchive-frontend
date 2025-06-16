@@ -2,7 +2,11 @@
   <div class="chart-container">
     <div class="chart-selector">
       <label for="chart-type">Chart Type: </label>
-      <select id="chart-type" v-model="chartType">
+      <select
+        id="chart-type"
+        :value="localChartType"
+        @change="updateChartType($event.target.value)"
+      >
         <option value="bar">Bar (by Decade)</option>
         <option value="pie">Pie (by Genre)</option>
       </select>
@@ -62,11 +66,16 @@ export default {
       type: Array,
       required: true,
     },
+    chartType: {
+      type: String,
+      required: true,
+      validator: (value) => ["bar", "pie"].includes(value),
+    },
   },
   data() {
     return {
       localMusicSheets: [...this.musicSheets],
-      chartType: "bar",
+      localChartType: this.chartType,
       isLoading: false,
       error: null,
     };
@@ -78,20 +87,20 @@ export default {
       },
       deep: true,
     },
-    chartType() {
-      this.$forceUpdate();
-    },
+    // chartType() {
+    //   this.$forceUpdate();
+    // },
   },
   computed: {
     chartComponent() {
-      return this.chartType === "bar" ? "Bar" : "Pie";
+      return this.localChartType === "bar" ? "Bar" : "Pie";
     },
     chartData() {
       if (!Array.isArray(this.localMusicSheets)) {
         return this.emptyChartData();
       }
 
-      if (this.chartType === "bar") {
+      if (this.localChartType === "bar") {
         const decadeCounts = {};
         this.localMusicSheets.forEach((sheet) => {
           if (!sheet.year || typeof sheet.year !== "number") return;
@@ -147,7 +156,7 @@ export default {
       }
     },
     chartOptions() {
-      if (this.chartType === "bar") {
+      if (this.localChartType === "bar") {
         return {
           responsive: true,
           maintainAspectRatio: false,
@@ -235,12 +244,15 @@ export default {
     },
   },
   methods: {
+    updateChartType(newType) {
+      this.localChartType = newType; // Update the local state
+    },
     emptyChartData() {
       return {
         labels: [],
         datasets: [
           {
-            label: this.chartType === "bar" ? "Music Sheets by Decade" : "Music Sheets by Genre",
+            label: this.localChartType === "bar" ? "Music Sheets by Decade" : "Music Sheets by Genre",
             data: [],
             backgroundColor: "#532b88",
           },
@@ -284,8 +296,8 @@ export default {
 <style scoped>
 .chart-container {
   position: relative;
-  height: 300px;
   width: 100%;
+  height: 600px;
   max-width: 300px;
   background-color: #2c3e50;
   border-radius: 8px;

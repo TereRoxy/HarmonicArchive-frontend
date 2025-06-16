@@ -9,13 +9,15 @@
       :isLoadingGenres="isLoadingGenres"
       :isLoadingInstruments="isLoadingInstruments"
       :musicSheets="musicSheets"
+      :isSidebarOpen="isSidebarOpen"
       @toggleGenre="toggleGenre"
       @toggleInstrument="toggleInstrument"
       @clearFilters="clearFilters"
+      @toggle-sidebar="toggleSidebar"
     />
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" :class="{ 'main-content-full': !isSidebarOpen }">
       <!-- Header Component -->
       <Header
         v-model:searchQuery="searchQuery"
@@ -87,7 +89,7 @@ export default {
       sortBy: "title",
       sortOrder: "asc",
       currentPage: 1,
-      itemsPerPage: 12,
+      itemsPerPage: 16,
       worker: null,
       workerActive: false,
       genres: [],
@@ -101,7 +103,8 @@ export default {
       isManualDisconnect: false, // Flag to indicate manual disconnection
       isLoading: false, // Track loading state for infinite scroll
       allItemsLoaded: false, // Track if all items are loaded
-      chunkSize: 24, // Number of items to fetch per scroll
+      chunkSize: 64, // Number of items to fetch per scroll
+      isSidebarOpen: false, // Track sidebar state
     };
   },
   methods: {
@@ -280,6 +283,9 @@ export default {
           }
         });
     },
+    toggleSidebar() {
+      this.isSidebarOpen = !this.isSidebarOpen;
+    },
   },
   created() {
     this.fetchTags(); // Fetch tags when the component is created
@@ -303,4 +309,18 @@ export default {
 </script>
 
 <style src="../assets/dashboard.css">
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.main-content-full {
+  margin-left: 0;
+}
+
 </style>

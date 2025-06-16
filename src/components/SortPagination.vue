@@ -76,10 +76,10 @@
           :value="itemsPerPage"
           @change="$emit('changeItemsPerPage', $event.target.value)"
         >
-          <option value="6">6 per page</option>
-          <option value="12">12 per page</option>
-          <option value="24">24 per page</option>
-          <option value="48">48 per page</option>
+          <option value="8">8 per page</option>
+          <option value="16">16 per page</option>
+          <option value="32">32 per page</option>
+          <option value="64">64 per page</option>
           <option value="all">All</option>
         </select>
       </div>
@@ -89,10 +89,10 @@
         :value="itemsPerPage"
         @change="$emit('changeItemsPerPage', $event.target.value)"
       >
-        <option value="6">6 per page</option>
-        <option value="12">12 per page</option>
-        <option value="24">24 per page</option>
-        <option value="48">48 per page</option>
+        <option value="8">8 per page</option>
+        <option value="16">16 per page</option>
+        <option value="32">32 per page</option>
+        <option value="64">64 per page</option>
         <option value="all">All</option>
       </select>
     </div>
@@ -143,29 +143,9 @@ export default {
 </script>
 
 <style scoped>
-.sort-pagination-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-}
 
 .sort-label {
   font-weight: bold;
-}
-
-.sort-options {
-  display: flex;
-}
-
-.sort-options button {
-  background-color: #532b88;
-  color: #ffffff;
-  border: none;
-  padding: 8px 12px;
-  cursor: pointer;
 }
 
 .sort-options button:hover {

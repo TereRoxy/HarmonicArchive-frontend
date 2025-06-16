@@ -4,6 +4,7 @@ import Upload from "./views/Upload.vue";
 import View from "./views/View.vue";
 import ViewMusicScore from "./components/ViewMusicScore.vue";
 import LoginRegister from "./views/LoginRegister.vue";
+import ChartsPage from "./views/ChartsPage.vue";
 
 const routes = [
   {
@@ -20,6 +21,11 @@ const routes = [
     path: "/upload", 
     name: "Upload",
     component: Upload 
+  },
+  {
+    path: "/charts",
+    name: "ChartsPage",
+    component: ChartsPage,
   },
   // In router.js
   {
