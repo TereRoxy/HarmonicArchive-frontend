@@ -42,6 +42,10 @@
         :musicSheets="musicSheets"
         @openItem="openItem"
       />
+      <!-- Loading Indicator for Infinite Scroll -->
+      <div v-if="isLoading && itemsPerPage === 'all'" class="loading">
+        Loading more music sheets...
+      </div>
 
       <!-- Upload Button -->
       <router-link to="/upload">
@@ -88,24 +92,30 @@ export default {
       workerActive: false,
       genres: [],
       instruments: [],
-      musicSheets: [], // Replace state.musicSheets with local data
+      musicSheets: [],
       totalItems: 0, // Total number of items for pagination
       connectionStatus: 'disconnected', // Connection status for WebSocket
       reconnectAttempts: 0,
       maxReconnectAttempts: 5, // Maximum number of reconnection attempts
       lastWebSocketError: null, // Store the last WebSocket message
       isManualDisconnect: false, // Flag to indicate manual disconnection
+      isLoading: false, // Track loading state for infinite scroll
+      allItemsLoaded: false, // Track if all items are loaded
+      chunkSize: 24, // Number of items to fetch per scroll
     };
   },
   methods: {
-    fetchMusicSheets() {
+    fetchMusicSheets(append = false) {
+      if (this.isLoading || this.allItemsLoaded) return;
+
+      this.isLoading = true; // Set loading state to true
     const params = {
       title: this.searchQuery,
       composer: this.searchQuery,
       genres: this.selectedGenres.join(","),
       instruments: this.selectedInstruments.join(","),
       _page: this.currentPage,
-      _limit: this.itemsPerPage === 'all' ? 1000 : this.itemsPerPage, // Use large limit for 'all'
+      _limit: this.itemsPerPage === 'all' ? this.chunkSize : this.itemsPerPage, // Use large limit for 'all'
       _sort: this.sortBy,
       _order: this.sortOrder,
     };
@@ -113,13 +123,37 @@ export default {
 
     api.getMusicSheets(params)
       .then(response => {
-        this.musicSheets = response.data.data || response.data; // Handle both response formats
+        const newSheets = response.data.data || response.data; // Handle both response formats
         this.totalItems = response.data.totalCount;
+
+        if (append) {
+          this.musicSheets = [...this.musicSheets, ...newSheets];
+        } else {
+          this.musicSheets = newSheets;
+        }
+
+        if (this.itemsPerPage === 'all' && this.musicSheets.length >= this.totalItems) {
+          this.allItemsLoaded = true; // If 'all' is selected, mark all items as loaded
+        } 
       })
       .catch(error => {
         console.error("Error fetching music sheets:", error);
+      })
+      .finally(() => {
+        this.isLoading = false; // Reset loading state
       });
   },
+
+  handleScroll() {
+      if (this.itemsPerPage !== 'all' || this.isLoading || this.allItemsLoaded) return;
+
+      const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.offsetHeight - 100;
+
+      if (nearBottom) {
+        this.currentPage += 1;
+        this.fetchMusicSheets(true); // Append new items
+      }
+    },
 
   totalPages() {
       if (this.itemsPerPage === 'all') {

@@ -18,7 +18,7 @@
       </button>
     </div>
 
-    <div class="pagination">
+    <div v-if="itemsPerPage !== 'all'" class="pagination">
       <button
         data-testid="prev-page"
         @click="$emit('goToPage', currentPage - 1)"
@@ -84,6 +84,18 @@
         </select>
       </div>
     </div>
+    <div v-else class="items-per-page">
+      <select
+        :value="itemsPerPage"
+        @change="$emit('changeItemsPerPage', $event.target.value)"
+      >
+        <option value="6">6 per page</option>
+        <option value="12">12 per page</option>
+        <option value="24">24 per page</option>
+        <option value="48">48 per page</option>
+        <option value="all">All</option>
+      </select>
+    </div>
   </div>
 </template>
 
@@ -103,7 +115,7 @@ export default {
   },
   computed: {
     pagesToShow() {
-      if (this.totalPages <= 1) {
+      if (this.totalPages <= 1 || this.itemsPerPage === 'all') {
         return [];
       }
 

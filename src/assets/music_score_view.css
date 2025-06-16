@@ -164,8 +164,7 @@
 
 .form-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 8px;
+  gap: 10px;
   margin-top: 16px;
 }
 
@@ -175,6 +174,8 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  flex: 1;
+  transition: all 0.3s ease;
 }
 
 .save-btn {
@@ -182,6 +183,14 @@
   background: #9b72cf;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px 10px 5px 10px;
   cursor: pointer;
+  flex: 1;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn:hover, .save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
