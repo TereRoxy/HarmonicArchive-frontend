@@ -1,11 +1,11 @@
 <template>
-  <div class="sidebar">
+  <div class="sidebar-container">
+    <button class="sidebar-toggle" :class="{ 'sidebar-toggle-collapsed': !isSidebarOpen }" @click="$emit('toggle-sidebar')">
+      ☰
+    </button>
+    <div class="sidebar" :class="{ 'sidebar-collapsed': !isSidebarOpen }">
     <!-- Profile Section -->
     <div class="profile-section">
-       <!-- Sidebar Toggle Button (Visible on Mobile) -->
-      <button class="sidebar-toggle" @click="isSidebarOpen = !isSidebarOpen">
-        ☰
-      </button>
       <img src="../assets/images/profile.png" alt="Profile" class="profile-img" />
       <div class="profile-info">
         <router-link to="/my-account" class="my-account-btn">My Account</router-link>
@@ -86,6 +86,7 @@
     <div class="chart-container">
       <MusicSheetsChart :musicSheets="musicSheets" />
     </div>
+    </div>
   </div>
 </template>
 
@@ -127,6 +128,10 @@ export default {
       default: () => [], // Provide empty array as default
     },
     workerActive: Boolean,
+    isSidebarOpen: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -216,8 +221,17 @@ export default {
   background-color: #6a3dbb;
 }
 
+.sidebar-container {
+  position: relative;
+  z-index: 1000;
+}
+
 .sidebar {
-  flex: 0 0 250px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 300px;
   background-color: #9b72cf;
   padding: 20px;
   color: white;
@@ -231,35 +245,17 @@ export default {
 }
 
 .sidebar-toggle {
-  display: none;
   background-color: #532b88;
   color: white;
   border: none;
   padding: 10px;
   cursor: pointer;
+  border-radius: 5px;
   position: fixed;
   top: 10px;
   left: 10px;
-  z-index: 1000;
-}
-
-@media (max-width: 768px) {
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    z-index: 999;
-    transform: translateX(-100%);
-  }
-
-  .sidebar-collapsed {
-    transform: translateX(0);
-  }
-
-  .sidebar-toggle {
-    display: block;
-  }
+  z-index: 1001;
+  display: block;
 }
 
 </style>

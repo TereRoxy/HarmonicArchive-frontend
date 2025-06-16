@@ -110,12 +110,14 @@
 .sort-pagination-container {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 20px;
 }
 
 .sort-options {
   display: flex;
+  align-items: center; /* Ensure buttons align with label */
+  margin-left: 10px; /* Small margin to separate from label */
 }
 
 .sort-options button {
@@ -188,6 +190,7 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
+  padding-left: 50px;
 }
 
 .header-content {
@@ -240,7 +243,7 @@
 
 .music-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
 }
 
