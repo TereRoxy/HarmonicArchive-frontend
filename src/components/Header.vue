@@ -12,9 +12,11 @@
         <button @click="clearSearch" class="clear-search-btn">❌</button>
       </div>
       <div v-if="showExternalSearchPrompt" class="external-search-prompt">
-        <p>No or few results found. Would you like to search IMSLP for "{{ localSearchQuery }}"?</p>
-        <button @click="performExternalSearch" class="external-search-btn">Search IMSLP</button>
-        <button @click="dismissExternalSearch" class="dismiss-btn">Cancel</button>
+        <p>No results found. Would you like to search IMSLP instead for "{{ localSearchQuery }}"?</p>
+        <div class="external-search-prompt-buttons">
+          <button @click="performExternalSearch" class="external-search-btn">Search IMSLP</button>
+          <button @click="dismissExternalSearch" class="dismiss-btn">Cancel</button>
+        </div>
       </div>
     </div>
   </div>
@@ -45,8 +47,8 @@ export default {
         const response = await api.getMusicSheets({ title: this.localSearchQuery });
         this.searchResults = response.data.results || [];
         
-        // Check if results are empty or insufficient (e.g., less than 3)
-        if (this.searchResults.length < 3) {
+        // Check if results are empty or insufficient
+        if (this.searchResults.length < 1) {
           this.showExternalSearchPrompt = true;
         } else {
           this.$emit('search', this.localSearchQuery, this.searchResults);
@@ -95,14 +97,13 @@ export default {
 }
 
 .external-search-prompt {
-  margin-top: 1rem;
-  padding: 1rem;
-  background-color: #fff3cd;
-  border: 1px solid #ffeeba;
+  margin: 1rem;
+  padding: 0.5rem; /* Reduce padding to make the prompt smaller */
+  
   border-radius: 4px;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  align-items: center; /* Center-align content */
 }
 
 .external-search-btn,
@@ -114,12 +115,22 @@ export default {
 }
 
 .external-search-btn {
-  background-color: #007bff;
+  background: #9b72cf;
   color: white;
+  border: none;
+  border-radius: 5px;
+  transition: all 0.3s ease;
 }
 
 .dismiss-btn {
   background-color: #6c757d;
   color: white;
+}
+
+.external-search-prompt-buttons {
+  display: flex; /* Use flex layout for buttons */
+  gap: 0.5rem; /* Add spacing between buttons */
+  width: 100%; /* Ensure buttons stretch evenly */
+  justify-content: center; /* Center-align buttons */
 }
 </style>

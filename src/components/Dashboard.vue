@@ -25,23 +25,6 @@
         @clearSearch="clearSearch"
       />
 
-    <!-- External Search Results -->
-    <div v-if="isExternalSearch && searchResults.length" class="external-results">
-      <h2>External Search Results</h2>
-      <ul class="results-list">
-        <li
-          v-for="result in searchResults"
-          :key="result.id"
-          class="result-item"
-          @click="redirectToUrl(result.url)"
-        >
-          <div class="result-title">{{ result.title }}</div>
-          <div class="result-composer">{{ result.composer }}</div>
-          <span class="result-tag">IMSLP</span>
-        </li>
-      </ul>
-    </div>
-
       <!-- Sort and Pagination Component -->
       <SortPagination
         :sortBy="sortBy"
@@ -59,6 +42,7 @@
       <!-- Music Grid Component -->
       <MusicGrid
         :musicSheets="musicSheets"
+        :isExternalSearch="isExternalSearch"
         @openItem="openItem"
       />
       <!-- Loading Indicator for Infinite Scroll -->
@@ -197,9 +181,11 @@ export default {
   },
 
   handleSearch(query, results) {
-      // Check if the results are external (e.g., based on the format or source)
-      this.isExternalSearch = results.some((result) => result.url); // External results have a `url` property
+      this.isExternalSearch = results.some((result) => result.url);
+      console.log("Search results:", results);
+      this.musicSheets = results; // Set musicSheets to search results (local or external)
       this.searchResults = results;
+      this.totalItems = this.isExternalSearch ? results.length : this.totalItems;
     },
     handleSearchError(errorMessage) {
       console.error("Search error:", errorMessage);
@@ -287,29 +273,26 @@ export default {
       return this.wsConnection && this.wsConnection.readyState === WebSocket.OPEN;
     },
 
-    // In methods:
-    openItem(id) {
-      // Ensure we have a valid ID
-      if (!id) {
-        console.error('No ID provided');
-        return;
+    openItem(idOrUrl) {
+      if (this.isExternalSearch) {
+        // For external search results, idOrUrl is a URL
+        this.redirectToUrl(idOrUrl);
+      } else {
+        // For local search results, idOrUrl is an ID
+        const numericId = Number(idOrUrl);
+        if (isNaN(numericId)) {
+          console.error('Invalid ID format');
+          return;
+        }
+        this.$router.push(`/${numericId}`)
+          .catch(err => {
+            if (!err.message.includes('Avoided redundant navigation')) {
+              console.error('Navigation error:', err);
+            }
+          });
       }
-      
-      // Convert to number if needed
-      const numericId = Number(id);
-      if (isNaN(numericId)) {
-        console.error('Invalid ID format');
-        return;
-      }
-
-      // Navigate using path format to ensure ID is passed
-      this.$router.push(`/${numericId}`)
-        .catch(err => {
-          if (!err.message.includes('Avoided redundant navigation')) {
-            console.error('Navigation error:', err);
-          }
-        });
     },
+    
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
     },
