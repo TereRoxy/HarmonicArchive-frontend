@@ -36,9 +36,13 @@
         @setSort="setSort"
         @goToPage="goToPage"
         @changeItemsPerPage="changeItemsPerPage"
-        @toggleWorker="toggleWorker"
+        @toggleWorker="toggleWorkerState"
         :workerActive="workerActive"
       />
+      <!-- Toggle Worker Button -->
+      <button @click="toggleWorkerState" class="toggle-worker-btn">
+        {{ workerActive ? "Stop Worker" : "Start Worker" }}
+      </button>
 
       <!-- Music Grid Component -->
       <MusicGrid
@@ -281,14 +285,14 @@ export default {
       this.currentPage = 1;
       this.fetchMusicSheets();
     },
-    async toggleWorker() {
-      const isRunning = !this.workerActive;
+    async toggleWorkerState() {
       try {
-        await api.toggleWorker(isRunning);
-        console.log(`Worker ${isRunning ? "started" : "stopped"}`); 
-        this.workerActive = isRunning;
+        this.workerActive = !this.workerActive; // Toggle the state
+        await api.toggleWorker(this.workerActive); // Call the API method
+        console.log(`Worker is now ${this.workerActive ? "active" : "inactive"}`);
       } catch (error) {
-        console.error('Error toggling worker:', error);
+        console.error("Error toggling worker state:", error);
+        this.workerActive = !this.workerActive; // Revert the state if the API call fails
       }
     },
 
