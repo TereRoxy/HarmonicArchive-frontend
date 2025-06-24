@@ -21,9 +21,26 @@
       <!-- Header Component -->
       <Header
         v-model:searchQuery="searchQuery"
-        @search="searchItems"
+        @search="handleSearch"
         @clearSearch="clearSearch"
       />
+
+    <!-- External Search Results -->
+    <div v-if="isExternalSearch && searchResults.length" class="external-results">
+      <h2>External Search Results</h2>
+      <ul class="results-list">
+        <li
+          v-for="result in searchResults"
+          :key="result.id"
+          class="result-item"
+          @click="redirectToUrl(result.url)"
+        >
+          <div class="result-title">{{ result.title }}</div>
+          <div class="result-composer">{{ result.composer }}</div>
+          <span class="result-tag">IMSLP</span>
+        </li>
+      </ul>
+    </div>
 
       <!-- Sort and Pagination Component -->
       <SortPagination
@@ -105,6 +122,8 @@ export default {
       allItemsLoaded: false, // Track if all items are loaded
       chunkSize: 64, // Number of items to fetch per scroll
       isSidebarOpen: false, // Track sidebar state
+      searchResults: [],
+      isExternalSearch: false,
     };
   },
   methods: {
@@ -177,16 +196,24 @@ export default {
     }
   },
 
-    searchItems(query) {
-      this.searchQuery = query;
-      this.currentPage = 1;
-      this.fetchMusicSheets();
+  handleSearch(query, results) {
+      // Check if the results are external (e.g., based on the format or source)
+      this.isExternalSearch = results.some((result) => result.url); // External results have a `url` property
+      this.searchResults = results;
+    },
+    handleSearchError(errorMessage) {
+      console.error("Search error:", errorMessage);
+    },
+    redirectToUrl(url) {
+      window.open(url, "_blank"); // Open the URL in a new tab
     },
     clearSearch() {
       this.searchQuery = "";
       this.selectedGenres = [];
       this.selectedInstruments = [];
       this.currentPage = 1;
+      this.isExternalSearch = false; // Reset external search state
+      this.searchResults = [];
       this.fetchMusicSheets();
     },
     toggleGenre(genre) {
@@ -322,5 +349,4 @@ export default {
 .main-content-full {
   margin-left: 0;
 }
-
 </style>
