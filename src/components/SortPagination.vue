@@ -1,9 +1,9 @@
 <template>
   <div class="sort-pagination-container">
-    <div class="sort-label">
+    <div v-if="!disableSort" class="sort-label">
       <span>Sort by:</span>
     </div>
-    <div class="sort-options">
+    <div v-if="!disableSort" class="sort-options">
       <button @click="$emit('setSort', 'title')">
         Name
         <span v-if="sortBy === 'title'">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
@@ -18,7 +18,7 @@
       </button>
     </div>
 
-    <div v-if="itemsPerPage !== 'all'" class="pagination">
+    <div v-if="itemsPerPage !== 'all' && !disableSort" class="pagination">
       <button
         data-testid="prev-page"
         @click="$emit('goToPage', currentPage - 1)"
@@ -71,7 +71,7 @@
         Next →
       </button>
 
-      <div class="items-per-page">
+      <div v-if="!disableSort" class="items-per-page">
         <select
           :value="itemsPerPage"
           @change="$emit('changeItemsPerPage', $event.target.value)"
@@ -84,7 +84,7 @@
         </select>
       </div>
     </div>
-    <div v-else class="items-per-page">
+    <div v-else v-if="!disableSort" class="items-per-page">
       <select
         :value="itemsPerPage"
         @change="$emit('changeItemsPerPage', $event.target.value)"
@@ -105,6 +105,7 @@ export default {
     sortBy: String,
     sortOrder: String,
     currentPage: Number,
+    disableSort: { type: Boolean, default: false },
     totalPages: {
       type: Number,
       default: 1,

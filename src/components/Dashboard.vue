@@ -32,6 +32,7 @@
         :currentPage="currentPage"
         :totalPages="totalPages()"
         :itemsPerPage="itemsPerPage"
+        :disableSort="isExternalSearch"
         @setSort="setSort"
         @goToPage="goToPage"
         @changeItemsPerPage="changeItemsPerPage"
@@ -115,6 +116,35 @@ export default {
       if (this.isLoading || this.allItemsLoaded) return;
 
       this.isLoading = true; // Set loading state to true
+
+      if (this.isExternalSearch) {
+        // External IMSLP search
+        const params = {
+          title: this.searchQuery,
+          page: this.currentPage,
+          per_page: this.itemsPerPage === 'all' ? this.chunkSize : this.itemsPerPage,
+        };
+        api.searchIMSLP(params)
+          .then(response => {
+            const newSheets = response.results || [];
+            this.totalItems = response.total_results || 0;
+            this.totalPagesExternal = response.total_pages || 1;
+            if (append) {
+              this.musicSheets = [...this.musicSheets, ...newSheets];
+            } else {
+              this.musicSheets = newSheets;
+            }
+            if (this.itemsPerPage === 'all' && this.musicSheets.length >= this.totalItems) {
+              this.allItemsLoaded = true;
+            }
+          })
+          .catch(error => {
+            console.error("Error fetching IMSLP music sheets:", error);
+          })
+          .finally(() => {
+            this.isLoading = false;
+          });
+    } else{
     const params = {
       title: this.searchQuery,
       composer: this.searchQuery,
@@ -148,6 +178,7 @@ export default {
       .finally(() => {
         this.isLoading = false; // Reset loading state
       });
+    }
   },
 
   handleScroll() {
@@ -180,12 +211,12 @@ export default {
     }
   },
 
-  handleSearch(query, results) {
+  handleSearch(query, results, totalResults) {
       this.isExternalSearch = results.some((result) => result.url);
       console.log("Search results:", results);
       this.musicSheets = results; // Set musicSheets to search results (local or external)
       this.searchResults = results;
-      this.totalItems = this.isExternalSearch ? results.length : this.totalItems;
+      this.totalItems = this.isExternalSearch ? totalResults : this.totalItems;
     },
     handleSearchError(errorMessage) {
       console.error("Search error:", errorMessage);
@@ -292,7 +323,7 @@ export default {
           });
       }
     },
-    
+
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
     },

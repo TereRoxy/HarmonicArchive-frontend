@@ -44,14 +44,18 @@ export default {
       this.showExternalSearchPrompt = false;
       try {
         // Perform local search first
-        const response = await api.getMusicSheets({ title: this.localSearchQuery });
-        this.searchResults = response.data.results || [];
+        const response = await api.getMusicSheets({ title: this.localSearchQuery, composer: this.localSearchQuery });
+        console.log('Local search response:', response.data);
+        this.searchResults = response.data.data || [];
+        const totalResults = response.data.data.length || 0;
+        console.log('Search results:', this.searchResults);
+        console.log('Total results:',   totalResults);
         
         // Check if results are empty or insufficient
         if (this.searchResults.length < 1) {
           this.showExternalSearchPrompt = true;
         } else {
-          this.$emit('search', this.localSearchQuery, this.searchResults);
+          this.$emit('search', this.localSearchQuery, this.searchResults, totalResults);
         }
       } catch (error) {
         console.error('Local search error:', error);
@@ -65,8 +69,9 @@ export default {
         const response = await api.searchIMSLP({ title: this.localSearchQuery });
         console.log('IMSLP search response:', response);
         this.searchResults = response.results;
+        const totalResults = response.totalResults || 0;
         this.showExternalSearchPrompt = false;
-        this.$emit('search', this.localSearchQuery, this.searchResults);
+        this.$emit('search', this.localSearchQuery, this.searchResults, totalResults);
       } catch (error) {
         console.error('IMSLP search error:', error);
         this.$emit('searchError', 'Failed to fetch results from IMSLP');

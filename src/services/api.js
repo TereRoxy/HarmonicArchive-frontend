@@ -161,7 +161,7 @@ export const getFileUrl = (path, fileType = 'music') => {
 };
 
 // IMSLP Search API
-export const searchIMSLP = async ({ composer = '', title = '', page = 1, per_page = 10 }) => {
+export const searchIMSLP = async ({ composer = '', title = '', page = 1, per_page = 16 }) => {
   try {
     const response = await imslpApi.get('/search', {
       params: { composer, title, page, per_page },
