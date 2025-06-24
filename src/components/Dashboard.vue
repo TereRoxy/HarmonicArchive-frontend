@@ -21,7 +21,7 @@
       <!-- Header Component -->
       <Header
         v-model:searchQuery="searchQuery"
-        @search="searchItems"
+        @search="handleSearch"
         @clearSearch="clearSearch"
       />
 
@@ -32,6 +32,7 @@
         :currentPage="currentPage"
         :totalPages="totalPages()"
         :itemsPerPage="itemsPerPage"
+        :disableSort="isExternalSearch"
         @setSort="setSort"
         @goToPage="goToPage"
         @changeItemsPerPage="changeItemsPerPage"
@@ -42,6 +43,7 @@
       <!-- Music Grid Component -->
       <MusicGrid
         :musicSheets="musicSheets"
+        :isExternalSearch="isExternalSearch"
         @openItem="openItem"
       />
       <!-- Loading Indicator for Infinite Scroll -->
@@ -105,6 +107,8 @@ export default {
       allItemsLoaded: false, // Track if all items are loaded
       chunkSize: 64, // Number of items to fetch per scroll
       isSidebarOpen: false, // Track sidebar state
+      searchResults: [],
+      isExternalSearch: false,
     };
   },
   methods: {
@@ -112,6 +116,35 @@ export default {
       if (this.isLoading || this.allItemsLoaded) return;
 
       this.isLoading = true; // Set loading state to true
+
+      if (this.isExternalSearch) {
+        // External IMSLP search
+        const params = {
+          title: this.searchQuery,
+          page: this.currentPage,
+          per_page: this.itemsPerPage === 'all' ? this.chunkSize : this.itemsPerPage,
+        };
+        api.searchIMSLP(params)
+          .then(response => {
+            const newSheets = response.results || [];
+            this.totalItems = response.total_results || 0;
+            this.totalPagesExternal = response.total_pages || 1;
+            if (append) {
+              this.musicSheets = [...this.musicSheets, ...newSheets];
+            } else {
+              this.musicSheets = newSheets;
+            }
+            if (this.itemsPerPage === 'all' && this.musicSheets.length >= this.totalItems) {
+              this.allItemsLoaded = true;
+            }
+          })
+          .catch(error => {
+            console.error("Error fetching IMSLP music sheets:", error);
+          })
+          .finally(() => {
+            this.isLoading = false;
+          });
+    } else{
     const params = {
       title: this.searchQuery,
       composer: this.searchQuery,
@@ -145,6 +178,7 @@ export default {
       .finally(() => {
         this.isLoading = false; // Reset loading state
       });
+    }
   },
 
   handleScroll() {
@@ -177,16 +211,26 @@ export default {
     }
   },
 
-    searchItems(query) {
-      this.searchQuery = query;
-      this.currentPage = 1;
-      this.fetchMusicSheets();
+  handleSearch(query, results, totalResults) {
+      this.isExternalSearch = results.some((result) => result.url);
+      console.log("Search results:", results);
+      this.musicSheets = results; // Set musicSheets to search results (local or external)
+      this.searchResults = results;
+      this.totalItems = this.isExternalSearch ? totalResults : this.totalItems;
+    },
+    handleSearchError(errorMessage) {
+      console.error("Search error:", errorMessage);
+    },
+    redirectToUrl(url) {
+      window.open(url, "_blank"); // Open the URL in a new tab
     },
     clearSearch() {
       this.searchQuery = "";
       this.selectedGenres = [];
       this.selectedInstruments = [];
       this.currentPage = 1;
+      this.isExternalSearch = false; // Reset external search state
+      this.searchResults = [];
       this.fetchMusicSheets();
     },
     toggleGenre(genre) {
@@ -260,29 +304,26 @@ export default {
       return this.wsConnection && this.wsConnection.readyState === WebSocket.OPEN;
     },
 
-    // In methods:
-    openItem(id) {
-      // Ensure we have a valid ID
-      if (!id) {
-        console.error('No ID provided');
-        return;
+    openItem(idOrUrl) {
+      if (this.isExternalSearch) {
+        // For external search results, idOrUrl is a URL
+        this.redirectToUrl(idOrUrl);
+      } else {
+        // For local search results, idOrUrl is an ID
+        const numericId = Number(idOrUrl);
+        if (isNaN(numericId)) {
+          console.error('Invalid ID format');
+          return;
+        }
+        this.$router.push(`/${numericId}`)
+          .catch(err => {
+            if (!err.message.includes('Avoided redundant navigation')) {
+              console.error('Navigation error:', err);
+            }
+          });
       }
-      
-      // Convert to number if needed
-      const numericId = Number(id);
-      if (isNaN(numericId)) {
-        console.error('Invalid ID format');
-        return;
-      }
-
-      // Navigate using path format to ensure ID is passed
-      this.$router.push(`/${numericId}`)
-        .catch(err => {
-          if (!err.message.includes('Avoided redundant navigation')) {
-            console.error('Navigation error:', err);
-          }
-        });
     },
+
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
     },
@@ -322,5 +363,4 @@ export default {
 .main-content-full {
   margin-left: 0;
 }
-
 </style>

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { BASE_URL } from '../../config.js'; // Adjust the import path as necessary 
+import { IMSLP_API_URL} from '../../config.js'; // Adjust the import path as necessary
 
 const api = axios.create({
   baseURL: `${BASE_URL}/api`,
@@ -7,6 +8,15 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: true, // Include credentials for CORS requests
+});
+
+// IMSLP API instance for search endpoint
+const imslpApi = axios.create({
+  baseURL: `${IMSLP_API_URL}`, // Separate base URL for IMSLP service
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  // withCredentials: true,
 });
 
 // Login API
@@ -150,6 +160,19 @@ export const getFileUrl = (path, fileType = 'music') => {
   return `${BASE_URL}/${cleanPath}`;
 };
 
+// IMSLP Search API
+export const searchIMSLP = async ({ composer = '', title = '', page = 1, per_page = 16 }) => {
+  try {
+    const response = await imslpApi.get('/search', {
+      params: { composer, title, page, per_page },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('IMSLP search error:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
 export default {
   uploadMusicFile,
   uploadMetadata,
@@ -217,5 +240,7 @@ export default {
     ws.onclose = () => console.log('WebSocket disconnected');
   
     return ws;
-  }
+  },
+  // IMSLP Search API
+  searchIMSLP,
 };
