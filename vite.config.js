@@ -17,9 +17,9 @@ export default defineConfig({
   },
   server: {
     host: "0.0.0.0", // Use your machine's correct IP address
-    server: {
-      host: "0.0.0.0",
-      port: process.env.PORT || 5173, // Use Railway's PORT environment variable or default to 5173
-    },
+    port: process.env.PORT || 5173, // Use Railway's PORT environment variable or default to 5173
+  },
+  preview: {
+    allowedHosts: ["harmonic-archive.up.railway.app"], // Add Railway's domain to allowed hosts
   },
 });
