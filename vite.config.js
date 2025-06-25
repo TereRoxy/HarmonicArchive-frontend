@@ -16,7 +16,10 @@ export default defineConfig({
     format: "es", // Enable ES module format for Web Workers
   },
   server: {
-    host: BASE_IP, // Use your machine's correct IP address
-    port: 5173,
+    host: "0.0.0.0", // Use your machine's correct IP address
+    server: {
+      host: "0.0.0.0",
+      port: process.env.PORT || 5173, // Use Railway's PORT environment variable or default to 5173
+    },
   },
 });
