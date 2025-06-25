@@ -2,7 +2,7 @@
   <div class="container">
     <!-- Left Section: Drag and Drop or Choose File -->
     <div class="upload-area">
-      <div class="drag-drop-area small" @dragover.prevent @drop.prevent="handleDrop('music')">
+      <div class="drag-drop-area small" @dragover.prevent @drop.prevent="handleDrop('music', $event)">
         <div class="overlay">
           <input
             ref="musicFileInput"
@@ -133,10 +133,13 @@ export default {
   },
   methods: {
     handleDrop(type, event) {
+      console.log("Drag-and-drop event triggered:", event);
       const files = event.dataTransfer.files;
       if (files.length > 0) {
+        console.log("Files dropped:", files);
         if (type === "music") {
           this.selectedMusicFile = files[0];
+          this.uploadFile(files[0]); // Automatically upload the file
         } else if (type === "video") {
           this.selectedVideoFile = files[0];
         }
