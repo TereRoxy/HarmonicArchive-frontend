@@ -50,6 +50,11 @@ const routes = [
     component: () => import("./components/MyAccount.vue"),
     // meta: { requiresAuth: true },
   },
+  // Catch-all route for 404s
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/', // Redirect to the login page
+  },
 ];
 
 const router = createRouter({

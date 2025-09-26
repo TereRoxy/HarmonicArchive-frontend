@@ -214,33 +214,33 @@ export default {
   // },
 
   // Worker control
-  toggleWorker(isRunning) {
-    return api.post('/MusicSheets/toggle-worker', null, {
-      params: { isRunning }
-    });
-  },
+  // toggleWorker(isRunning) {
+  //   return api.post('/MusicSheets/toggle-worker', null, {
+  //     params: { isRunning }
+  //   });
+  // },
 
-  // WebSocket setup
-  // api.js
-  setupWebSocket(onMessage) {
-    const ws = new WebSocket(`${BASE_URL.replace('http', 'ws')}/api/MusicSheets/ws`);
+  // // WebSocket setup
+  // // api.js
+  // setupWebSocket(onMessage) {
+  //   const ws = new WebSocket(`${BASE_URL.replace('http', 'ws')}/api/MusicSheets/ws`);
   
-    ws.onopen = () => console.log('WebSocket connected');
+  //   ws.onopen = () => console.log('WebSocket connected');
     
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        onMessage(data); // Directly pass the music sheet data
-      } catch (error) {
-        console.error('Error parsing WebSocket message:', error);
-      }
-    };
+  //   ws.onmessage = (event) => {
+  //     try {
+  //       const data = JSON.parse(event.data);
+  //       onMessage(data); // Directly pass the music sheet data
+  //     } catch (error) {
+  //       console.error('Error parsing WebSocket message:', error);
+  //     }
+  //   };
   
-    ws.onerror = (error) => console.error('WebSocket error:', error);
-    ws.onclose = () => console.log('WebSocket disconnected');
+  //   ws.onerror = (error) => console.error('WebSocket error:', error);
+  //   ws.onclose = () => console.log('WebSocket disconnected');
   
-    return ws;
-  },
+  //   return ws;
+  // },
   // IMSLP Search API
   searchIMSLP,
 };

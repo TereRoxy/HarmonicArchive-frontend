@@ -40,9 +40,9 @@
         :workerActive="workerActive"
       />
       <!-- Toggle Worker Button -->
-      <button @click="toggleWorkerState" class="toggle-worker-btn">
+      <!-- <button @click="toggleWorkerState" class="toggle-worker-btn">
         {{ workerActive ? "Stop Worker" : "Start Worker" }}
-      </button>
+      </button> -->
 
       <!-- Music Grid Component -->
       <MusicGrid
@@ -285,24 +285,24 @@ export default {
       this.currentPage = 1;
       this.fetchMusicSheets();
     },
-    async toggleWorkerState() {
-      try {
-        this.workerActive = !this.workerActive; // Toggle the state
-        await api.toggleWorker(this.workerActive); // Call the API method
-        console.log(`Worker is now ${this.workerActive ? "active" : "inactive"}`);
-      } catch (error) {
-        console.error("Error toggling worker state:", error);
-        this.workerActive = !this.workerActive; // Revert the state if the API call fails
-      }
-    },
+    // async toggleWorkerState() {
+    //   try {
+    //     this.workerActive = !this.workerActive; // Toggle the state
+    //     await api.toggleWorker(this.workerActive); // Call the API method
+    //     console.log(`Worker is now ${this.workerActive ? "active" : "inactive"}`);
+    //   } catch (error) {
+    //     console.error("Error toggling worker state:", error);
+    //     this.workerActive = !this.workerActive; // Revert the state if the API call fails
+    //   }
+    // },
 
-    setupWebSocket() {
-      this.wsConnection = api.setupWebSocket((newSheet) => {
-        this.musicSheets = [this.musicSheets, newSheet];
-        console.log("New sheet added:", newSheet);
-        this.totalItems += 1;
-      });
-    },
+    // setupWebSocket() {
+    //   this.wsConnection = api.setupWebSocket((newSheet) => {
+    //     this.musicSheets = [this.musicSheets, newSheet];
+    //     console.log("New sheet added:", newSheet);
+    //     this.totalItems += 1;
+    //   });
+    // },
 
     isWebSocketOpen() {
       return this.wsConnection && this.wsConnection.readyState === WebSocket.OPEN;
